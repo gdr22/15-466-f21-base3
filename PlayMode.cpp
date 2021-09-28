@@ -69,6 +69,70 @@ void PlayMode::play_note(int note) {
 	auto sound = Sound::play_3D(*note_sfx[note - note_base], 1.0f, glm::vec3(0.f));
 }
 
+void PlayMode::init_level(int level) {
+	boxes.clear();
+	crates.clear();
+
+	// Clear all background tiles
+	for (uint32_t y = 0; y < PPU466::BackgroundHeight; ++y) {
+		for (uint32_t x = 0; x < PPU466::BackgroundWidth; ++x) {
+			ppu.background[x + PPU466::BackgroundWidth * y] = 255 | (0 << 8);
+		}
+	}
+
+	// Copy in the tile map
+	for(uint32_t x = 0; x < TILEMAP_WIDTH; ++x) {
+		for(uint32_t y = 0; y < TILEMAP_HEIGHT; ++y) {
+			tile_map[y][x] = levels[level][y][x];
+
+			if(tile_map[y][x] == 1) {
+				int bgx = 2 * x;
+				int bgy = 2 * (TILEMAP_HEIGHT - y - 1);
+
+				ppu.background[(bgx    ) + PPU466::BackgroundWidth * (bgy    )] = 0;
+				ppu.background[(bgx + 1) + PPU466::BackgroundWidth * (bgy    )] = 1;
+				ppu.background[(bgx    ) + PPU466::BackgroundWidth * (bgy + 1)] = 16;
+				ppu.background[(bgx + 1) + PPU466::BackgroundWidth * (bgy + 1)] = 17;
+			}
+			else if(tile_map[y][x] == 2) {
+				int bgx = 2 * x;
+				int bgy = 2 * (TILEMAP_HEIGHT - y - 1);
+
+				Box box;
+				box.music_time = (int)boxes.size();
+				box.at  = glm::vec2(bgx * TILE_SIZE, bgy * TILE_SIZE);
+				box.src = glm::vec2(bgx * TILE_SIZE, bgy * TILE_SIZE);
+				boxes.emplace_back(box);
+			}
+			else if(tile_map[y][x] == 3) {
+				int bgx = 2 * x;
+				int bgy = 2 * (TILEMAP_HEIGHT - y - 1);
+
+				Crate crate;
+				crate.at = glm::vec2(bgx * TILE_SIZE, bgy * TILE_SIZE);
+				crate.vel = glm::vec2(0.f);
+				crates.emplace_back(crate);
+			}
+
+
+		}
+	}
+
+	// Copy the music notes for this level
+	music = notes[level];
+	note_error = note_errs[level];
+	music_times = note_times[level];
+	music_errors = 1;
+	music_len = (int)music.size();
+	music_pos = music_len + 1;
+	
+	player_at.x = 128;
+	player_at.y = 96;
+
+	player_screen_pos.x = (int)player_at.x;
+	player_screen_pos.y = (int)player_at.y;
+}
+
 PlayMode::PlayMode() {
 	std::vector< char > to;
 	std::filebuf fb; 
@@ -107,48 +171,7 @@ PlayMode::PlayMode() {
 		{0, 1, 16, 17}, {32, 33, 48, 49}, {2, 3, 18, 19}, {4, 5, 20, 21}, {6, 7, 22, 23}
 	};
 
-	// Clear all background tiles
-	for (uint32_t y = 0; y < PPU466::BackgroundHeight; ++y) {
-		for (uint32_t x = 0; x < PPU466::BackgroundWidth; ++x) {
-			ppu.background[x + PPU466::BackgroundWidth * y] = 255 | (0 << 8);
-		}
-	}
-
-	// Copy in the tile map
-	for(uint32_t x = 0; x < TILEMAP_WIDTH; ++x) {
-		for(uint32_t y = 0; y < TILEMAP_HEIGHT; ++y) {
-			if(tile_map[y][x] == 1) {
-				int bgx = 2 * x;
-				int bgy = 2 * (TILEMAP_HEIGHT - y - 1);
-
-				ppu.background[(bgx    ) + PPU466::BackgroundWidth * (bgy    )] = 0;
-				ppu.background[(bgx + 1) + PPU466::BackgroundWidth * (bgy    )] = 1;
-				ppu.background[(bgx    ) + PPU466::BackgroundWidth * (bgy + 1)] = 16;
-				ppu.background[(bgx + 1) + PPU466::BackgroundWidth * (bgy + 1)] = 17;
-			}
-			else if(tile_map[y][x] == 2) {
-				int bgx = 2 * x;
-				int bgy = 2 * (TILEMAP_HEIGHT - y - 1);
-
-				Box box;
-				box.music_time = (int)boxes.size();
-				box.at  = glm::vec2(bgx * TILE_SIZE, bgy * TILE_SIZE);
-				box.src = glm::vec2(bgx * TILE_SIZE, bgy * TILE_SIZE);
-				boxes.emplace_back(box);
-			}
-			else if(tile_map[y][x] == 3) {
-				int bgx = 2 * x;
-				int bgy = 2 * (TILEMAP_HEIGHT - y - 1);
-
-				Crate crate;
-				crate.at = glm::vec2(bgx * TILE_SIZE, bgy * TILE_SIZE);
-				crate.vel = glm::vec2(0.f);
-				crates.emplace_back(crate);
-			}
-
-
-		}
-	}
+	init_level(level);
 
 	//start music loop playing:
 	// (note: position will be over-ridden in update())
@@ -159,12 +182,6 @@ PlayMode::PlayMode() {
 				 note72 };
 
 	Sound::listener.set_position_right(glm::vec3(0.f), glm::vec3(1.f, 0.f, 0.f), 1.0f / 60.0f);
-	
-	player_at.x = 128;
-	player_at.y = 96;
-
-	player_screen_pos.x = (int)player_at.x;
-	player_screen_pos.y = (int)player_at.y;
 }
 
 PlayMode::~PlayMode() {
@@ -312,7 +329,7 @@ bool PlayMode::collide_above(glm::vec2 pos) {
 }
 
 void PlayMode::update(float elapsed) {
-	if(play.pressed && music_pos >= 10) {
+	if(play.pressed && music_pos >= music_len) {
 		note_timer = 0.f;
 		music_pos = 0;
 		music_errors = 0;
@@ -425,8 +442,18 @@ void PlayMode::update(float elapsed) {
 		music_pos++;
 
 		// If we finish the song with no errors, you win!
-		if(music_pos >= music_len && music_errors == 0) {
-			printf("Correct!");
+		if(music_pos > music_len && music_errors == 0) {
+			printf("Correct!\n");
+			level++;
+
+			if(level >= LEVEL_CNT) {
+				printf("You win!");
+				Mode::set_current(nullptr);
+			}
+			else {
+				init_level(level);
+			}
+
 		}
 	}
 }
