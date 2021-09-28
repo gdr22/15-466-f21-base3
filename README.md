@@ -18,7 +18,7 @@ Use A/D to move left or right, and W to jump. Push crates by walking into them.
 Sources: 
 Sprite pipeline and PPU code re-used from https://github.com/gdr22/15-466-f21-base1
 
-Music is based on the works of Beethoven and Neil Cicirega's album Dinosaurchestra,
+Music is based on the works of Beethoven and Lemon Demon's album Dinosaurchestra,
 which is published under an Attribution-NonCommercial-ShareAlike license.
 https://lemondemon.bandcamp.com/album/dinosaurchestra
 https://creativecommons.org/licenses/by-nc-sa/3.0/
