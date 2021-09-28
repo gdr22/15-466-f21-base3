@@ -161,8 +161,8 @@ PlayMode::PlayMode() {
 	std::vector< glm::u8vec4 > data;
 	load_png(data_path("../assets/Palettes.png"), &size, &data, UpperLeftOrigin);
 
-	for (int i = 0; i < data.size(); i += 4) {
-		for (int j = 0; j < 4; j++) {
+	for (size_t i = 0; i < data.size(); i += 4) {
+		for (size_t j = 0; j < 4; j++) {
 			ppu.palette_table[i / 4][j] = data[i + j];
 		}
 	}
@@ -189,8 +189,8 @@ PlayMode::~PlayMode() {
 
 void PlayMode::draw_sprite(int x, int y, int size, bool background, int palette) {
 	// Ignore sprites beyond the screen range
-	if (x < 0 || x > PPU466::ScreenWidth) return;
-	if (y < 0 || y > PPU466::ScreenHeight) return;
+	if (x < 0 || x > (int)PPU466::ScreenWidth) return;
+	if (y < 0 || y > (int)PPU466::ScreenHeight) return;
 
 	std::vector<int> x_off = { 0, TILE_SIZE, 0, TILE_SIZE };
 	std::vector<int> y_off = { 0, 0, TILE_SIZE, TILE_SIZE };
@@ -198,8 +198,8 @@ void PlayMode::draw_sprite(int x, int y, int size, bool background, int palette)
 	// Draws 1x1 or 2x2 sprites
 	int i = 0;
 	for (int tile : sprite_tiles[size]) {
-		if (x + x_off[i] < 0 || x + x_off[i] >= PPU466::ScreenWidth) continue;
-		if (y - y_off[i] < 0 || y - y_off[i] >= PPU466::ScreenHeight) continue;
+		if (x + x_off[i] < 0 || x + x_off[i] >= (int)PPU466::ScreenWidth) continue;
+		if (y - y_off[i] < 0 || y - y_off[i] >= (int)PPU466::ScreenHeight) continue;
 		// If we have more than the allowed number of sprites, just ignore to precent crashing.
 		if (sprite_cnt == 64) continue;
 
