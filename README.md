@@ -1,8 +1,8 @@
-# (TODO: your game's title)
+# Harmonic Balance
 
-Author: (TODO: your name)
+Author: George Ralph
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: This platformer makes every level a music puzzle. Players solve the puzzle by fixing the out of tune notes.
 
 Screen Shot:
 
@@ -10,7 +10,10 @@ Screen Shot:
 
 How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
+Each level has a short tune being played on the note blocks, but a few of them are out of tune. Press R to hear the song, and see which blocks are out of tune (flash red). Push crates or stand on top of a note block to bring down 
+its pitch.
+
+Use A/D to move left or right, and W to jump. Push crates by walking into them.
 
 Sources: (TODO: list a source URL for any assets you did not create yourself. Make sure you have a license for the asset.)
 

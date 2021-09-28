@@ -149,6 +149,7 @@ COMMON_NAMES =
 	data_path
 	PathFont
 	PathFont-font
+	PPU466
 	DrawLines
 	ColorProgram
 	Scene
