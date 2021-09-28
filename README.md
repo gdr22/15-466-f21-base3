@@ -6,7 +6,7 @@ Design: This platformer makes every level a music puzzle. Players solve the puzz
 
 Screen Shot:
 
-![Screen Shot](screenshot.png)
+![Screen Shot](img.png)
 
 How To Play:
 
