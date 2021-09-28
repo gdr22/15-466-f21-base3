@@ -15,7 +15,13 @@ its pitch.
 
 Use A/D to move left or right, and W to jump. Push crates by walking into them.
 
-Sources: (TODO: list a source URL for any assets you did not create yourself. Make sure you have a license for the asset.)
+Sources: 
+Sprite pipeline and PPU code re-used from https://github.com/gdr22/15-466-f21-base1
+
+Music is based on the works of Beethoven and Neil Cicirega's album Dinosaurchestra,
+which is published under an Attribution-NonCommercial-ShareAlike license.
+https://lemondemon.bandcamp.com/album/dinosaurchestra
+https://creativecommons.org/licenses/by-nc-sa/3.0/
 
 This game was built with [NEST](NEST.md).
 
